@@ -52,7 +52,7 @@ describe('listOrganizations unit', () => {
     // Add axios error properties
     (axiosError as any).isAxiosError = true;
     (axiosError as any).config = {
-      url: 'https://app.vssps.visualstudio.com/_apis/profile/profiles/me',
+      url: 'https://dev.azure.com/test-org/_apis/profile/profiles/me',
     };
 
     // Setup the mock for the first call
@@ -125,5 +125,17 @@ describe('listOrganizations unit', () => {
         url: 'https://dev.azure.com/org-name-2',
       },
     ]);
+
+    // Verify API calls
+    expect(mockedAxios.get).toHaveBeenNthCalledWith(
+      1,
+      'https://dev.azure.com/_apis/profile/profiles/me?api-version=6.0',
+      expect.any(Object),
+    );
+    expect(mockedAxios.get).toHaveBeenNthCalledWith(
+      2,
+      'https://dev.azure.com/_apis/accounts?memberId=test-alias&api-version=6.0',
+      expect.any(Object),
+    );
   });
 });

@@ -57,10 +57,9 @@ describe('getMe', () => {
 
     // Assert
     expect(mockAxios.get).toHaveBeenCalledWith(
-      'https://vssps.dev.azure.com/testorg/_apis/profile/profiles/me?api-version=7.1',
+      `https://dev.azure.com/_apis/profile/profiles/me?api-version=7.1`,
       expect.any(Object),
     );
-
     expect(result).toEqual({
       id: 'user-id-123',
       displayName: 'Test User',

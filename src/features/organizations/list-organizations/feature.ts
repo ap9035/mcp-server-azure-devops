@@ -7,6 +7,7 @@ import {
 import { DefaultAzureCredential, AzureCliCredential } from '@azure/identity';
 import { AuthenticationMethod } from '../../../shared/auth';
 import { Organization, AZURE_DEVOPS_RESOURCE_ID } from '../types';
+import { getBaseUrl } from '../../../shared/utils/url';
 
 /**
  * Lists all Azure DevOps organizations accessible to the authenticated user
@@ -22,6 +23,9 @@ export async function listOrganizations(
   config: AzureDevOpsConfig,
 ): Promise<Organization[]> {
   try {
+    // Get the base URL without organization name
+    const baseUrl = getBaseUrl(config.organizationUrl);
+
     // Determine auth method and create appropriate authorization header
     let authHeader: string;
 
@@ -55,7 +59,7 @@ export async function listOrganizations(
 
     // Step 1: Get the user profile to get the publicAlias
     const profileResponse = await axios.get(
-      'https://app.vssps.visualstudio.com/_apis/profile/profiles/me?api-version=6.0',
+      `${baseUrl}/_apis/profile/profiles/me?api-version=6.0`,
       {
         headers: {
           Authorization: authHeader,
@@ -74,7 +78,7 @@ export async function listOrganizations(
 
     // Step 2: Get organizations using the publicAlias
     const orgsResponse = await axios.get(
-      `https://app.vssps.visualstudio.com/_apis/accounts?memberId=${publicAlias}&api-version=6.0`,
+      `${baseUrl}/_apis/accounts?memberId=${publicAlias}&api-version=6.0`,
       {
         headers: {
           Authorization: authHeader,

@@ -4,9 +4,9 @@ import { DefaultAzureCredential, AzureCliCredential } from '@azure/identity';
 import {
   AzureDevOpsError,
   AzureDevOpsAuthenticationError,
-  AzureDevOpsValidationError,
 } from '../../../shared/errors';
 import { UserProfile } from '../types';
+import { getBaseUrl } from '../../../shared/utils/url';
 
 /**
  * Get details of the currently authenticated user
@@ -19,16 +19,14 @@ import { UserProfile } from '../types';
  */
 export async function getMe(connection: WebApi): Promise<UserProfile> {
   try {
-    // Extract organization from the connection URL
-    const { organization } = extractOrgFromUrl(connection.serverUrl);
-
     // Get the authorization header
     const authHeader = await getAuthorizationHeader();
+    const baseUrl = getBaseUrl(connection.serverUrl);
 
     // Make direct call to the Profile API endpoint
     // Note: This API is in the vssps.dev.azure.com domain, not dev.azure.com
     const response = await axios.get(
-      `https://vssps.dev.azure.com/${organization}/_apis/profile/profiles/me?api-version=7.1`,
+      `${baseUrl}/_apis/profile/profiles/me?api-version=7.1`,
       {
         headers: {
           Authorization: authHeader,
@@ -36,7 +34,6 @@ export async function getMe(connection: WebApi): Promise<UserProfile> {
         },
       },
     );
-
     const profile = response.data;
 
     // Return the user profile with required fields
@@ -66,28 +63,6 @@ export async function getMe(connection: WebApi): Promise<UserProfile> {
       `Failed to get user information: ${error instanceof Error ? error.message : String(error)}`,
     );
   }
-}
-
-/**
- * Extract organization from the Azure DevOps URL
- *
- * @param url The Azure DevOps URL
- * @returns The organization
- */
-function extractOrgFromUrl(url: string): { organization: string } {
-  // Extract organization from the URL
-  const match = url.match(/https?:\/\/dev\.azure\.com\/([^/]+)/);
-  const organization = match ? match[1] : '';
-
-  if (!organization) {
-    throw new AzureDevOpsValidationError(
-      'Could not extract organization from URL',
-    );
-  }
-
-  return {
-    organization,
-  };
 }
 
 /**
