@@ -4,7 +4,7 @@ import {
   AzureDevOpsError,
   AzureDevOpsAuthenticationError,
   AzureDevOpsResourceNotFoundError,
-} from '@/shared/errors';
+} from '../../../shared/errors';
 
 // Unit tests should only focus on isolated logic
 describe('listPipelines unit', () => {

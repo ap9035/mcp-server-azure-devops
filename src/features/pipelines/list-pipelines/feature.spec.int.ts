@@ -3,7 +3,7 @@ import { listPipelines } from './feature';
 import {
   getTestConnection,
   shouldSkipIntegrationTest,
-} from '@/shared/test/test-helpers';
+} from '../../../shared/test/test-helpers';
 
 describe('listPipelines integration', () => {
   let connection: WebApi | null = null;

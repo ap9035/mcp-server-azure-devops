@@ -1,5 +1,4 @@
 import { WebApi } from 'azure-devops-node-api';
-import { Pipeline as ApiPipeline } from 'azure-devops-node-api/interfaces/PipelinesInterfaces';
 import {
   AzureDevOpsError,
   AzureDevOpsAuthenticationError,
@@ -23,21 +22,12 @@ export async function listPipelines(
     const { projectId, orderBy, top, continuationToken } = options;
 
     // Call the pipelines API to get the list of pipelines
-    const apiPipelines = await pipelinesApi.listPipelines(
+    const pipelines = await pipelinesApi.listPipelines(
       projectId,
       orderBy,
       top,
       continuationToken,
     );
-
-    // Convert API Pipeline objects to our Pipeline type
-    const pipelines: Pipeline[] = apiPipelines.map((pipeline: ApiPipeline) => ({
-      id: pipeline.id || 0,
-      name: pipeline.name || '',
-      folder: pipeline.folder || '',
-      revision: pipeline.revision || 0,
-      url: pipeline.url || '',
-    }));
 
     return pipelines;
   } catch (error) {
