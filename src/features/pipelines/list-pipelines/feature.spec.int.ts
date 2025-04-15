@@ -22,7 +22,7 @@ describe('listPipelines integration', () => {
     if (
       shouldSkipIntegrationTest() ||
       !connection ||
-      !process.env.AZURE_DEVOPS_PROJECT
+      !process.env.AZURE_DEVOPS_DEFAULT_PROJECT
     ) {
       console.log(
         'Skipping listPipelines integration test - no connection or project available',
@@ -30,7 +30,7 @@ describe('listPipelines integration', () => {
       return;
     }
 
-    const projectId = process.env.AZURE_DEVOPS_PROJECT;
+    const projectId = process.env.AZURE_DEVOPS_DEFAULT_PROJECT;
 
     const pipelines = await listPipelines(connection, { projectId });
     expect(Array.isArray(pipelines)).toBe(true);
