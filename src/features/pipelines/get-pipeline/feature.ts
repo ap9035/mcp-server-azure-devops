@@ -28,6 +28,13 @@ export async function getPipeline(
       pipelineVersion,
     );
 
+    // If pipeline not found, API returns null instead of throwing error
+    if (pipeline === null) {
+      throw new AzureDevOpsResourceNotFoundError(
+        `Pipeline not found with ID: ${pipelineId}`,
+      );
+    }
+
     return pipeline;
   } catch (error) {
     // Handle specific error types
