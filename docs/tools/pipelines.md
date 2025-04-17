@@ -130,3 +130,131 @@ const versionResult = await callTool('get_pipeline', {
 });
 ```
 
+## trigger_pipeline
+
+Triggers a run of a specific pipeline.
+
+### Parameters
+
+| Parameter            | Type                  | Required | Description                                                          |
+| -------------------- | --------------------- | -------- | -------------------------------------------------------------------- |
+| `projectId`          | string                | No       | The ID or name of the project (Default: from environment)            |
+| `pipelineId`         | number                | Yes      | The numeric ID of the pipeline to trigger                            |
+| `branch`             | string                | No       | The branch to run the pipeline on (e.g., "main", "feature/my-branch")|
+| `variables`          | object                | No       | Variables to pass to the pipeline run                                |
+| `templateParameters` | object                | No       | Parameters for template-based pipelines                              |
+| `stagesToSkip`       | array                 | No       | Stages to skip in the pipeline run                                   |
+| `yamlOverride`       | string                | No       | YAML override to use for this run (for preview runs only)            |
+| `previewRun`         | boolean               | No       | If true, only preview the run without actually running the pipeline  |
+| `resources`          | object                | No       | Custom resources configuration for repositories and pipelines        |
+
+#### Variables Format
+
+```json
+{
+  "myVariable": {
+    "value": "my-value",
+    "isSecret": false
+  },
+  "secretVariable": {
+    "value": "secret-value",
+    "isSecret": true
+  }
+}
+```
+
+#### Resources Format
+
+```json
+{
+  "repositories": {
+    "self": {
+      "refName": "refs/heads/main"
+    },
+    "myRepo": {
+      "repository": {
+        "id": "repo-guid",
+        "name": "my-repository",
+        "type": "azureReposGit"
+      },
+      "refName": "refs/heads/feature/my-branch",
+      "version": "main"
+    }
+  },
+  "pipelines": {
+    "myPipeline": {
+      "pipeline": {
+        "id": 5,
+        "name": "Dependency Pipeline"
+      },
+      "version": "20220101.1"
+    }
+  }
+}
+```
+
+### Response
+
+Returns a run object with details about the triggered pipeline run:
+
+```json
+{
+  "id": 12345,
+  "name": "20230215.1",
+  "createdDate": "2023-02-15T10:30:00Z",
+  "url": "https://dev.azure.com/organization/project/_apis/pipelines/runs/12345",
+  "_links": {
+    "self": {
+      "href": "https://dev.azure.com/organization/project/_apis/pipelines/runs/12345"
+    },
+    "web": {
+      "href": "https://dev.azure.com/organization/project/_build/results?buildId=12345"
+    }
+  },
+  "state": "inProgress",
+  "result": null,
+  "variables": {
+    "myVariable": {
+      "value": "my-value",
+      "isSecret": false
+    }
+  }
+}
+```
+
+### Error Handling
+
+- Returns `AzureDevOpsResourceNotFoundError` if the pipeline or project does not exist
+- Returns `AzureDevOpsAuthenticationError` if authentication fails
+- Returns generic error messages for other failures
+
+### Example Usage
+
+```javascript
+// Trigger a pipeline on the default branch
+const result = await callTool('trigger_pipeline', {
+  pipelineId: 4
+});
+
+// Trigger a pipeline on a specific branch with variables
+const runWithOptions = await callTool('trigger_pipeline', {
+  projectId: 'my-project',
+  pipelineId: 4,
+  branch: 'feature/my-branch',
+  variables: {
+    'deployEnvironment': {
+      value: 'staging',
+      isSecret: false
+    }
+  }
+});
+
+// Preview a pipeline run with specific stages to skip
+const previewResult = await callTool('trigger_pipeline', {
+  projectId: 'my-project',
+  pipelineId: 4,
+  previewRun: true,
+  stagesToSkip: ['test', 'deploy']
+});
+```
+
