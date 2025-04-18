@@ -582,8 +582,6 @@ export function createAzureDevOpsServer(config: AzureDevOpsConfig): Server {
             variables: args.variables,
             templateParameters: args.templateParameters,
             stagesToSkip: args.stagesToSkip,
-            yamlOverride: args.yamlOverride,
-            previewRun: args.previewRun,
           });
           return {
             content: [{ type: 'text', text: JSON.stringify(result, null, 2) }],

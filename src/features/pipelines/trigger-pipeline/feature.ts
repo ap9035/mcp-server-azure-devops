@@ -27,13 +27,10 @@ export async function triggerPipeline(
       variables,
       templateParameters,
       stagesToSkip,
-      yamlOverride,
-      previewRun,
-      resources: customResources,
     } = options;
 
     // Prepare run parameters
-    const runParameters: any = {};
+    const runParameters: Record<string, unknown> = {};
 
     // Add variables
     if (variables) {
@@ -50,43 +47,21 @@ export async function triggerPipeline(
       runParameters.stagesToSkip = stagesToSkip;
     }
 
-    // Add YAML override
-    if (yamlOverride) {
-      runParameters.yamlOverride = yamlOverride;
-    }
-
-    // Set preview mode
-    if (previewRun) {
-      runParameters.previewRun = true;
-    }
-
     // Prepare resources (including branch)
-    const resources: any = customResources || {};
+    const resources: Record<string, unknown> = branch
+      ? { repositories: { self: { refName: `refs/heads/${branch}` } } }
+      : {};
 
-    // If branch is provided and no custom repository resource exists, use 'self' repository
-    if (branch && (!resources.repositories || !resources.repositories.self)) {
-      resources.repositories = resources.repositories || {};
-      resources.repositories.self = {
-        refName: `refs/heads/${branch}`,
-      };
-    }
-
-    // Only add resources to run parameters if not empty
+    // Add resources to run parameters if not empty
     if (Object.keys(resources).length > 0) {
       runParameters.resources = resources;
     }
-
     // Call pipeline API to run pipeline
-    let result;
-    if (previewRun) {
-      result = await pipelinesApi.preview(runParameters, projectId, pipelineId);
-    } else {
-      result = await pipelinesApi.runPipeline(
-        runParameters,
-        projectId,
-        pipelineId,
-      );
-    }
+    const result = await pipelinesApi.runPipeline(
+      runParameters,
+      projectId,
+      pipelineId,
+    );
 
     return result;
   } catch (error) {

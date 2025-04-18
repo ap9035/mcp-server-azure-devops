@@ -23,7 +23,6 @@ describe('triggerPipeline unit', () => {
     // Mock the getPipelinesApi method
     mockPipelinesApi = {
       runPipeline: jest.fn(),
-      preview: jest.fn(),
     };
     mockConnection.getPipelinesApi = jest
       .fn()
@@ -87,32 +86,6 @@ describe('triggerPipeline unit', () => {
       4,
     );
     expect(result).toBe(mockRun);
-  });
-
-  test('should preview a run when previewRun is true', async () => {
-    // Arrange
-    const mockPreview = { finalYaml: 'yaml-content' };
-    mockPipelinesApi.preview.mockResolvedValue(mockPreview);
-
-    // Act
-    const result = await triggerPipeline(mockConnection, {
-      projectId: 'testproject',
-      pipelineId: 4,
-      previewRun: true,
-      yamlOverride: 'custom-yaml',
-    });
-
-    // Assert
-    expect(mockPipelinesApi.preview).toHaveBeenCalledWith(
-      expect.objectContaining({
-        previewRun: true,
-        yamlOverride: 'custom-yaml',
-      }),
-      'testproject',
-      4,
-    );
-    expect(mockPipelinesApi.runPipeline).not.toHaveBeenCalled();
-    expect(result).toBe(mockPreview);
   });
 
   test('should handle authentication errors', async () => {

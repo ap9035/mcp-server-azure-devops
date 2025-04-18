@@ -34,32 +34,6 @@ export interface TriggerPipelineOptions {
   variables?: Record<string, { value: string; isSecret?: boolean }>;
   templateParameters?: Record<string, string>;
   stagesToSkip?: string[];
-  yamlOverride?: string;
-  previewRun?: boolean;
-  resources?: {
-    repositories?: Record<
-      string,
-      {
-        refName?: string;
-        version?: string;
-        repository?: {
-          id?: string;
-          name?: string;
-          type?: string;
-        };
-      }
-    >;
-    pipelines?: Record<
-      string,
-      {
-        version?: string;
-        pipeline?: {
-          id?: number;
-          name?: string;
-        };
-      }
-    >;
-  };
 }
 
 export { Pipeline, Run };

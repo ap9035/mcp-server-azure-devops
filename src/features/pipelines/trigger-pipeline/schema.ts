@@ -21,7 +21,7 @@ export const TriggerPipelineSchema = z.object({
     .string()
     .optional()
     .describe(
-      'The branch to run the pipeline on (e.g., "main", "feature/my-branch")',
+      'The branch to run the pipeline on (e.g., "main", "feature/my-branch"). If left empty, the default branch will be used',
     ),
   // Variables to pass to the pipeline run
   variables: z
@@ -48,12 +48,4 @@ export const TriggerPipelineSchema = z.object({
     .string()
     .optional()
     .describe('YAML override to use for this run (for preview runs only)'),
-  // Whether to preview the run without actually running it
-  previewRun: z
-    .boolean()
-    .optional()
-    .default(false)
-    .describe(
-      'If true, only preview the run without actually running the pipeline',
-    ),
 });

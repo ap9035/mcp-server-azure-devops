@@ -132,21 +132,18 @@ const versionResult = await callTool('get_pipeline', {
 
 ## trigger_pipeline
 
-Triggers a run of a specific pipeline.
+Triggers a run of a specific pipeline. Allows specifying the branch to run on and passing variables to customize the pipeline execution.
 
 ### Parameters
 
-| Parameter            | Type                  | Required | Description                                                          |
-| -------------------- | --------------------- | -------- | -------------------------------------------------------------------- |
-| `projectId`          | string                | No       | The ID or name of the project (Default: from environment)            |
-| `pipelineId`         | number                | Yes      | The numeric ID of the pipeline to trigger                            |
-| `branch`             | string                | No       | The branch to run the pipeline on (e.g., "main", "feature/my-branch")|
-| `variables`          | object                | No       | Variables to pass to the pipeline run                                |
-| `templateParameters` | object                | No       | Parameters for template-based pipelines                              |
-| `stagesToSkip`       | array                 | No       | Stages to skip in the pipeline run                                   |
-| `yamlOverride`       | string                | No       | YAML override to use for this run (for preview runs only)            |
-| `previewRun`         | boolean               | No       | If true, only preview the run without actually running the pipeline  |
-| `resources`          | object                | No       | Custom resources configuration for repositories and pipelines        |
+| Parameter            | Type   | Required | Description                                                           |
+| -------------------- | ------ | -------- | --------------------------------------------------------------------- |
+| `projectId`          | string | No       | The ID or name of the project (Default: from environment)             |
+| `pipelineId`         | number | Yes      | The numeric ID of the pipeline to trigger                             |
+| `branch`             | string | No       | The branch to run the pipeline on (e.g., "main", "feature/my-branch") |
+| `variables`          | object | No       | Variables to pass to the pipeline run                                 |
+| `templateParameters` | object | No       | Parameters for template-based pipelines                               |
+| `stagesToSkip`       | array  | No       | Stages to skip in the pipeline run                                    |
 
 #### Variables Format
 
@@ -159,36 +156,6 @@ Triggers a run of a specific pipeline.
   "secretVariable": {
     "value": "secret-value",
     "isSecret": true
-  }
-}
-```
-
-#### Resources Format
-
-```json
-{
-  "repositories": {
-    "self": {
-      "refName": "refs/heads/main"
-    },
-    "myRepo": {
-      "repository": {
-        "id": "repo-guid",
-        "name": "my-repository",
-        "type": "azureReposGit"
-      },
-      "refName": "refs/heads/feature/my-branch",
-      "version": "main"
-    }
-  },
-  "pipelines": {
-    "myPipeline": {
-      "pipeline": {
-        "id": 5,
-        "name": "Dependency Pipeline"
-      },
-      "version": "20220101.1"
-    }
   }
 }
 ```
@@ -211,12 +178,11 @@ Returns a run object with details about the triggered pipeline run:
       "href": "https://dev.azure.com/organization/project/_build/results?buildId=12345"
     }
   },
-  "state": "inProgress",
+  "state": 1,
   "result": null,
   "variables": {
     "myVariable": {
-      "value": "my-value",
-      "isSecret": false
+      "value": "my-value"
     }
   }
 }
@@ -232,8 +198,9 @@ Returns a run object with details about the triggered pipeline run:
 
 ```javascript
 // Trigger a pipeline on the default branch
+// In this case, use default project from environment variables
 const result = await callTool('trigger_pipeline', {
-  pipelineId: 4
+  pipelineId: 4,
 });
 
 // Trigger a pipeline on a specific branch with variables
@@ -242,19 +209,10 @@ const runWithOptions = await callTool('trigger_pipeline', {
   pipelineId: 4,
   branch: 'feature/my-branch',
   variables: {
-    'deployEnvironment': {
+    deployEnvironment: {
       value: 'staging',
-      isSecret: false
-    }
-  }
-});
-
-// Preview a pipeline run with specific stages to skip
-const previewResult = await callTool('trigger_pipeline', {
-  projectId: 'my-project',
-  pipelineId: 4,
-  previewRun: true,
-  stagesToSkip: ['test', 'deploy']
+      isSecret: false,
+    },
+  },
 });
 ```
-
